@@ -1,0 +1,1 @@
+I, Rahul Vaidun, have read and understood the Winter 2021 CSE12/L syllabus and Personal Responsibility Document. rvaidun 7 January 2021
