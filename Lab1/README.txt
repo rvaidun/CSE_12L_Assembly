@@ -23,7 +23,7 @@ in_3 in_2 in_1 in_0  |  b_2  b_1  b_0
  1    1    0    1    |   1    1    0
  1    1    1    0    |   1    0    0
  1    1    1    1    |   0    1    0
-The third circuit solves the following circuit using Sum over Products (SOP)
+The third circuit solves the following circuit using Sum of Products (SOP)
 
 in_2 in_1 in_0  | c_0
  0    0    0    |  1
