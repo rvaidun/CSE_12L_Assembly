@@ -343,6 +343,14 @@ d_0
 4 bit multiplexer to read the 4 bits
 22 219 134 550 114 0 \NUL
  from the keypad or the ALU depending on selector
+19 432 275 491 256 0
+s_0
+19 435 247 494 228 0
+s_1
+19 434 209 493 190 0
+s_2
+19 430 183 489 164 0
+s_3
 1 165 171 118 171
 1 165 195 121 196
 1 165 207 139 207
