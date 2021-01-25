@@ -1,0 +1,21 @@
+assignment:  Lab 0
+name:        Rahul Vaidun
+cruzid:      rvaidun
+
+----------------------------------------
+GRADE BREAKDOWN
+----------------------------------------
+
+2 / 2 created all Lab{0,1,2,3,4,5} directories
+2 / 2 created all Lab{0,1,2,3,4,5}/README.txt files
+0 / 2 Lab0/README.txt includes the correct statement
+comment: The statement was not exactly correct.
+
+
+2 / 2 Lab0/README.txt contains CruzID
+2 / 2 Lab0/README.txt date in the correct format
+--------------------
+TOTAL
+
+points earned:   8
+lab total:       10
