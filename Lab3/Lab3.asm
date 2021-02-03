@@ -38,20 +38,32 @@ main:
 	j Exit
 
 ValidNum:
-	la $a0, prompt			# $a0 = address of prompt
-	li $v0, 4				# preparation to call print_string()
-	syscall					# call print_string()
+	la $a0, prompt # $a0 = address of prompt
+	li $v0, 4 # preparation to call print_string()
+	syscall # call print_string()
 	
-	li $v0, 5				# preparation to call read_int()	
-	syscall					# call read_int()
-	move $s0, $v0			# $s0 = height of pattern
+	li $v0, 5 # preparation to call read_int()	
+	syscall # call read_int()
+	move $s0, $v0 # $s0 = height of pattern
 	
-	bgt $s0, $zero, Outer   # if $s0 > 0, go to Outer
-	la $a0, errmsg			# $a0 = address of errmsg
-	li $v0, 4				# preparation to call print_string()
-	syscall					# call print_string()
+	bgt $s0, $zero, printTriangle # if $s0 > 0, go to printTriangle Else error message and go to ValidNum
+	la $a0, errmsg # $a0 = address of errmsg
+	li $v0, 4 # preparation to call print_string()
+	syscall # call print_string()
 	j ValidNum
-Outer:
+printTriangle:
+	li $t0, 0 # $t0 is x, counter for outside loop, $s0 is end
+	start_outer_loop:
+		beq $t0, $s0, end_outer_loop
+	# Inner loop
+	li $t1, 0 # Beginning of inner loop (y)
+	addi $t2, $t0, 1
+	mul $t2, $t2, 2
+	addi $t2, $t2, -1 #$t2 is stopping point for inner loop
+	start_inner_loop:
+		beq $t1, $t2, end_inner_loop
+		beq $t0, $t1, printNum
+		addi $t1, $t1, 1 # Increment counter
 Exit:
-	li $v0, 10				# preparation to exit
-	syscall					# exit the program
+	li $v0, 10 # preparation to exit
+	syscall # exit the program
