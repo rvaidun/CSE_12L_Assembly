@@ -7,8 +7,12 @@ Lab 3: ASCII-risks (Asterisks)
 DESCRIPTION
 
 This program will print out a pattern with numbers and stars (asterisks). 
-1. It will first prompt for the height of the pattern. If the user enters an invalid input such as a negative number or zero, an error message will be printed and the user will be prompted again.
-2. Then program should printd the following pattern using numbers and stars with a tab between each of them:
+1. It will first prompt for the height of the pattern. 
+If the user enters an invalid input such as a negative number or zero,
+an error message will be printed and the user will be prompted again.
+2. Then program will print a triangle pattern of stars and numbers based on the user input.
+
+The following is the output if the user enters 5:
 1
 *	2	*
 *	*	3	*	*
