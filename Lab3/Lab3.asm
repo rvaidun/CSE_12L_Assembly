@@ -11,7 +11,7 @@
 #
 # Notes: This program is intended to be run from the MARS IDE.
 ##########################################################################
-#        												Pseudocode
+#        			 	Pseudocode
 # infinite loop:
 # 	prompt user to enter height of pattern
 # 	if number greater than 0:
@@ -33,9 +33,6 @@
 
 .text
 main:
-	j ValidNum
-
-ValidNum:
 	la $a0, prompt # $a0 = address of prompt
 	li $v0, 4 # preparation to call print_string()
 	syscall # call print_string()
@@ -44,11 +41,11 @@ ValidNum:
 	syscall # call read_int()
 	move $s0, $v0 # $s0 = height of pattern
 	
-	bgt $s0, $zero, printTriangle # if $s0 > 0, go to printTriangle Else error message and go to ValidNum
+	bgt $s0, $zero, printTriangle # if $s0 > 0, go to printTriangle Else error message and go to main
 	la $a0, errmsg # $a0 = address of errmsg
 	li $v0, 4 # preparation to call print_string()
 	syscall # call print_string()
-	j ValidNum
+	j main
 printTriangle:
 	li $t0, 0 # $t0 is x, counter for outside loop, $s0 is end
 	start_outer_loop:
