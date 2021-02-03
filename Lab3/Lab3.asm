@@ -63,7 +63,21 @@ printTriangle:
 	start_inner_loop:
 		beq $t1, $t2, end_inner_loop
 		beq $t0, $t1, printNum
+		inner_after_printNum:
+		bne $t0, $t1, printStar
+		inner_after_printStar:
 		addi $t1, $t1, 1 # Increment counter
+
+printNum:
+	move $a0, $t0 # $a0 = x
+	li $v0, 1 # prepare system to print_int()
+	syscall # call print_int()
+	j inner_after_printNum
+printStar:
+	move $a0, star
+	li $v0, 4
+	syscall
+
 Exit:
 	li $v0, 10 # preparation to exit
 	syscall # exit the program
