@@ -25,8 +25,8 @@
 #			else print a star and a tab
 # 	print a newline
 .data
-	prompt:		.asciiz "Enter the height of the pattern (must be greater than 0): "
-	star:		.asciiz "*\t"
+	prompt:		.asciiz "Enter the height of the pattern (must be greater than 0):\t"
+	star:		.asciiz "*"
 	newline:	.asciiz "\n"
 	tab:		.asciiz "\t"
 	errmsg:		.asciiz "Invalid entry!\n"
@@ -34,8 +34,6 @@
 .text
 main:
 	j ValidNum
-	
-	j Exit
 
 ValidNum:
 	la $a0, prompt # $a0 = address of prompt
@@ -54,29 +52,48 @@ ValidNum:
 printTriangle:
 	li $t0, 0 # $t0 is x, counter for outside loop, $s0 is end
 	start_outer_loop:
-		beq $t0, $s0, end_outer_loop
-	# Inner loop
-	li $t1, 0 # Beginning of inner loop (y)
-	addi $t2, $t0, 1
-	mul $t2, $t2, 2
-	addi $t2, $t2, -1 #$t2 is stopping point for inner loop
-	start_inner_loop:
-		beq $t1, $t2, end_inner_loop
-		beq $t0, $t1, printNum
-		inner_after_printNum:
-		bne $t0, $t1, printStar
-		inner_after_printStar:
-		addi $t1, $t1, 1 # Increment counter
+		beq $t0, $s0, Exit
+	# Start Inner loop
+		li $t1, 0 # Beginning of inner loop (y)
+		addi $t2, $t0, 1
+		mul $t2, $t2, 2
+		addi $t2, $t2, -1 #$t2 is stopping point for inner loop
+		start_inner_loop:
+			beq $t1, $t2, end_inner_loop
+			beq $t0, $t1, printNum
+			inner_after_printNum:
+			bne $t0, $t1, printStar
+			inner_after_printStar:
+			addi $t3, $t1, 1
+			bne $t3, $t2, printTab
+			inner_after_printTab:
+			addi $t1, $t1, 1 # Increment counter
+			b start_inner_loop
+		end_inner_loop:
+	# End Inner loop Back in Outer loop
+	la $a0, newline
+	li $v0, 4
+	syscall
+	addi $t0, $t0, 1 # increment counter
+	b start_outer_loop
+
+	
 
 printNum:
-	move $a0, $t0 # $a0 = x
+	addi $a0, $t0, 1
 	li $v0, 1 # prepare system to print_int()
 	syscall # call print_int()
 	j inner_after_printNum
 printStar:
-	move $a0, star
+	la $a0, star
 	li $v0, 4
 	syscall
+	j inner_after_printStar
+printTab:
+	la $a0, tab
+	li $v0, 4
+	syscall
+	j inner_after_printTab
 
 Exit:
 	li $v0, 10 # preparation to exit
