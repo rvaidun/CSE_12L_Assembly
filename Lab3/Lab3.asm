@@ -11,7 +11,7 @@
 #
 # Notes: This program is intended to be run from the MARS IDE.
 ##########################################################################
-#        			 		Pseudocode
+#                            Pseudocode
 # infinite loop:
 # 	prompt user to enter height of pattern
 # 	if number greater than 0:
@@ -27,13 +27,13 @@
 #		if y+1 not equal to end point for the loop ((x+1)*2-1): print a tab
 # 	print a newline
 ##########################################################################
-# REGISTER USAGE
+#                         Register Usage
 # $s0: user input (height) also stopping point for outer loop
 # $t0: counter for outside loop (x in the pseudocode)
 # $t1:  counter for inner loop (y in the pseudocode)
 # $t2: stopping point for the inner loop
-# #t3: $t1 + 1, used to check if tab is necessary
-
+# $t3: $t1 + 1, used to check if tab is necessary
+##########################################################################
 .data
 	prompt:		.asciiz "Enter the height of the pattern (must be greater than 0):\t"
 	star:		.asciiz "*"
