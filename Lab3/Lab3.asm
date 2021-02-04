@@ -64,7 +64,7 @@ printTriangle:
 		li $t1, 0                       # beginning of inner loop (y)
 		addi $t2, $t0, 1                # add $t0 and $t1 and store in $t2
 		mul  $t2, $t2, 2                # multiply $t2 and $t2 and store in $t2
-		addi $t2, $t2, -1               # $t2 is stopping point for inner loop
+		addi $t2, $t2, -1               # subtract 1 from $t2, $t2 is stopping point for inner loop
 		start_inner_loop:
 			beq $t1, $t2, end_inner_loop   # stop inner loop if $t1 = $t2
 			beq $t0, $t1, printNum         # if $t0 = $t1 print the current height ($t0+1)
