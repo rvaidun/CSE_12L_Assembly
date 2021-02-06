@@ -52,6 +52,7 @@ main:
 	move $s0, $v0                  # $s0 = height of pattern
 	
 	bgt $s0, $zero, printTriangle  # if $s0 > 0, go to printTriangle Else error message and go to main
+	nop
 	la $a0, errmsg                 # $a0 = address of errmsg
 	li $v0, 4                      # preparation to call print_string()
 	syscall                        # call print_string()
@@ -59,7 +60,8 @@ main:
 printTriangle:
 	li $t0, 0                      # $t0 is x, counter for outside loop, $s0 is end
 	start_outer_loop:
-		beq $t0, $s0, Exit
+		beq $t0, $s0, Exit         # if $t0 is equal to $s0 exit
+		nop
 	###################### inner loop #######################
 		li $t1, 0                       # beginning of inner loop (y)
 		addi $t2, $t0, 1                # add $t0 and $t1 and store in $t2
@@ -67,15 +69,20 @@ printTriangle:
 		addi $t2, $t2, -1               # subtract 1 from $t2, $t2 is stopping point for inner loop
 		start_inner_loop:
 			beq $t1, $t2, end_inner_loop   # stop inner loop if $t1 = $t2
+			nop
 			beq $t0, $t1, printNum         # if $t0 = $t1 print the current height ($t0+1)
+			nop
 			inner_after_printNum:
 			bne $t0, $t1, printStar        # if $t1 not equal to $t1 print a star
+			nop
 			inner_after_printStar:
 			addi $t3, $t1, 1               # $t3 = $t1 + 1 (y+1)
 			bne $t3, $t2, printTab         # if $t3 not equal to $t2 then print a tab
+			nop
 			inner_after_printTab:
 			addi $t1, $t1, 1               # increment counter for inner loop
 			b start_inner_loop             # go back to start of inner loop
+			nop
 		end_inner_loop:
 	###################### inner loop #######################
 	la $a0, newline                # set $a0 to newline
@@ -83,22 +90,26 @@ printTriangle:
 	syscall                        # call print_string()
 	addi $t0, $t0, 1               # increment counter
 	b start_outer_loop             # go back to start of outer loop
+	nop
 
 printNum:
 	addi $a0, $t0, 1               # store addition of register $t0 and 1 in $a0
 	li $v0, 1                      # prepare system to print_int()
 	syscall                        # call print_int()
-	j inner_after_printNum         # go back to inner loop
+	b inner_after_printNum         # go back to inner loop
+	nop
 printStar:
-	la $a0, star                   # load star address to $a0 
+	la $a0, star                   # load star address to $a0  
 	li $v0, 4                      # prepare system for print_string()
 	syscall                        # call print_string()
-	j inner_after_printStar        # go back to inner loop
+	b inner_after_printStar        # go back to inner loop
+	nop
 printTab:
 	la $a0, tab                    # load tab address to $a0
 	li $v0, 4                      # prepare system for print_string()
 	syscall                        # call print_string
-	j inner_after_printTab         # go back to inner loop
+	b inner_after_printTab         # go back to inner loop
+	nop
 
 Exit:
 	li $v0, 10                     # preparation to exit
