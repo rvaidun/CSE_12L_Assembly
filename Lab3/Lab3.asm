@@ -81,35 +81,30 @@ printTriangle:
 			nop
 			inner_after_printTab:
 			addi $t1, $t1, 1               # increment counter for inner loop
-			b start_inner_loop             # go back to start of inner loop
-			nop
+			j start_inner_loop             # go back to start of inner loop
 		end_inner_loop:
 	###################### inner loop #######################
 	la $a0, newline                # set $a0 to newline
 	li $v0, 4                      # prepare system to print_string()
 	syscall                        # call print_string()
 	addi $t0, $t0, 1               # increment counter
-	b start_outer_loop             # go back to start of outer loop
-	nop
+	j start_outer_loop             # go back to start of outer loop
 
 printNum:
 	addi $a0, $t0, 1               # store addition of register $t0 and 1 in $a0
 	li $v0, 1                      # prepare system to print_int()
 	syscall                        # call print_int()
-	b inner_after_printNum         # go back to inner loop
-	nop
+	j inner_after_printNum         # go back to inner loop
 printStar:
 	la $a0, star                   # load star address to $a0  
 	li $v0, 4                      # prepare system for print_string()
 	syscall                        # call print_string()
-	b inner_after_printStar        # go back to inner loop
-	nop
+	j inner_after_printStar        # go back to inner loop
 printTab:
 	la $a0, tab                    # load tab address to $a0
 	li $v0, 4                      # prepare system for print_string()
 	syscall                        # call print_string
-	b inner_after_printTab         # go back to inner loop
-	nop
+	j inner_after_printTab         # go back to inner loop
 
 Exit:
 	li $v0, 10                     # preparation to exit
