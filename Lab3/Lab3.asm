@@ -39,7 +39,7 @@
 	star:		.asciiz "*"
 	newline:	.asciiz "\n"
 	tab:		.asciiz "\t"
-	errmsg:		.asciiz "Invalid entry!\n"
+	errmsg:		.asciiz "Invalid Entry!\n"
 
 .text
 main:
