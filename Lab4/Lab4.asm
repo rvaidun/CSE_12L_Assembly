@@ -29,3 +29,10 @@
 # if length of stack == 0 print "SUCCESS: There are {count} pairs of braces.\n
 # else: print "ERROR - Brace(s) still on stack: {braces}\n"
 ##########################################################################
+.data
+    enterMsg:           .asciiz "You entered the file:\n"
+    errorInvalidArg:    .asciiz "ERROR: Invalid program argument.\n"
+    errorMisMatch1:     .asciiz "ERROR - There is a brace mismatch: "
+    errorMisMatch2:     .asciiz " at index "
+    errorStack:         .asciiz "ERROR - Brace(s) still on stack: "
+    newline:            .asciiz "\n"
