@@ -7,3 +7,6 @@
 .bbl
 .blg
 .aux
+
+#Ignore all jars. Ignore MARS jar
+*.jar
