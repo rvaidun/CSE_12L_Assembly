@@ -7,6 +7,6 @@
 .bbl
 .blg
 .aux
-
+*.py
 #Ignore all jars. Ignore MARS jar
 *.jar

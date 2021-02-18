@@ -36,3 +36,19 @@
     errorMisMatch2:     .asciiz " at index "
     errorStack:         .asciiz "ERROR - Brace(s) still on stack: "
     newline:            .asciiz "\n"
+.text
+main:
+    la $a0, enterMsg
+    li $v0, 4
+    syscall # print enterMsg
+    
+    lw $s0, 0($a1) # $s0 is the filename
+    move $a0, $s0
+    li $v0, 4
+    syscall # print program argument
+
+
+
+Exit:
+    li $v0, 10 # preparation to exit
+    syscall # exit the program
