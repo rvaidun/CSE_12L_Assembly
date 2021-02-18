@@ -40,15 +40,46 @@
 main:
     la $a0, enterMsg
     li $v0, 4
-    syscall # print enterMsg
+    syscall            # print enterMsg
     
-    lw $s0, 0($a1) # $s0 is the filename
+    lw $s0, 0($a1)     # $s0 is the filename
     move $a0, $s0
     li $v0, 4
-    syscall # print program argument
+    syscall            # print the file name
 
-
-
+    la $a0, newline
+    li $v0, 4
+    syscall            # print new line
+    la $a0, newline
+    li $v0, 4
+    syscall            # print new line
+    
+    jal firstNumber
+    j Exit
+### Check if the first character is a number and if true then print error ###
+firstNumber:
+    # Check for uppsercase letters
+    lb $t0, 0($s0)     # $t0 = first character of file name
+    sge $t1, $t0, 65   # if $t0 >= 65 then $t1 = 1 else $t1 = 0
+    sle $t2, $t0, 90   # if $t0 <= 90 then $t2 = 1 else $t2 = 0
+    and $t3, $t1, $t2
+    bne $t2, $t3, firstNumber2
+    nop
+    jr $ra
+    firstNumber2:
+    # Check for lowercase letters
+    sge $t1, $t0, 97   # if $t0 >= 65 then $t1 = 1 else $t1 = 0
+    sle $t2, $t0, 122   # if $t0 <= 90 then $t2 = 1 else $t2 = 0
+    and $t3, $t1, $t2
+    bne $t2, $t3, firstNumber3
+    nop
+    jr $ra
+    firstNumber3:
+    # print error message and exit
+    la $a0, errorInvalidArg
+    li $v0, 4
+    syscall
+    j Exit
 Exit:
-    li $v0, 10 # preparation to exit
-    syscall # exit the program
+    li $v0, 10         # preparation to exit
+    syscall            # exit the program
