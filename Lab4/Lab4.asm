@@ -53,33 +53,97 @@ main:
     la $a0, newline
     li $v0, 4
     syscall            # print new line
-    
+
     jal firstNumber
+
+    jal validFileName
     j Exit
-### Check if the first character is a number and if true then print error ###
+############################################################################
+# Procedure: firstNumber
+# Description: Check if the first character is a number and if true then print error
+# registers to be used:
+#   $t0 is first character
+#   $t1, $t2, $t3 are used to check of number falls in the proper ascii range
+#   $ra to jump register to main
+############################################################################
 firstNumber:
     # Check for uppsercase letters
     lb $t0, 0($s0)     # $t0 = first character of file name
     sge $t1, $t0, 65   # if $t0 >= 65 then $t1 = 1 else $t1 = 0
     sle $t2, $t0, 90   # if $t0 <= 90 then $t2 = 1 else $t2 = 0
-    and $t3, $t1, $t2
-    bne $t2, $t3, firstNumber2
+    and $t3, $t1, $t2  # $t1 ^ $t2 stored in $t3
+    beq $t3, 1, return # if $t3 is true go to main
     nop
-    jr $ra
-    firstNumber2:
     # Check for lowercase letters
     sge $t1, $t0, 97   # if $t0 >= 65 then $t1 = 1 else $t1 = 0
-    sle $t2, $t0, 122   # if $t0 <= 90 then $t2 = 1 else $t2 = 0
-    and $t3, $t1, $t2
-    bne $t2, $t3, firstNumber3
+    sle $t2, $t0, 122  # if $t0 <= 90 then $t2 = 1 else $t2 = 0
+    and $t3, $t1, $t2  # $t1 ^ $t2 stored in $t3
+    beq $t3, 1, return # if $t3 is true go to main
     nop
-    jr $ra
-    firstNumber3:
     # print error message and exit
     la $a0, errorInvalidArg
     li $v0, 4
     syscall
     j Exit
+
+############################################################################
+# Procedure: validFileName
+# Description: Checks if each character is valid, a-z A-Z 0-9 . _ 
+# AND checks if length is greater than 20
+# registers to be used:
+#   $t0 is first character
+#   $t1, $t2, $t3 are used to check of number falls in the proper ascii range
+#   $ra to jump register to main
+############################################################################
+validFileName:
+    move $t0, $s0      # t0 is filename
+    li $t1, 0          # t1 is counter for length of file
+    validFileNameLoop:
+        lb $t2, 0($t0) # t2 is current character
+        addi $t1, $t1, 1 # increment counter
+        beq $t1, 20, printInvalidArg
+        addi $t0, $t0, 1 # increment file name
+
+
+        # Check for uppsercase letters. ascii A-Z is 65-90 decimal
+        sge $t3, $t2, 65   # if $t2 >= 65 then $t3 = 1 else $t3 = 0
+        sle $t4, $t2, 90   # if $t2 <= 90 then $t4 = 1 else $t4 = 0
+        and $t5, $t3, $t4  # t3 ^ $t4 stored in $t5
+        beq $t5, 1, validFileNameLoop # if $t5 is true go to top of loop
+        nop
+        # Check for lowercase letters. ascii a-z is 97-122 decimal
+        sge $t3, $t2, 97   
+        sle $t4, $t2, 122   
+        and $t5, $t3, $t4
+        beq $t5, 1, validFileNameLoop
+        nop
+        # Checks for numbers. ascii 0-9 is 48-57 decimal
+        sge $t3, $t2, 48   
+        sle $t4, $t2, 57   
+        and $t5, $t3, $t4  
+        beq $t5, 1, validFileNameLoop
+        nop
+        # Checks for periods. ascii . is 46
+        seq $t3, $t2, 46
+        beq $t3, 1, validFileNameLoop
+        nop
+        # Checks for underscore. ascii _ is 95
+        seq $t3, $t2, 95
+        beq $t3, 1, validFileNameLoop
+        nop
+
+        # if none of the checks pass print error exit
+        printInvalidArg:
+        la $a0, errorInvalidArg
+        li $v0, 4
+        syscall
+        j Exit
+
+    validCharacter:
+    
+
+return:
+    jr $ra
 Exit:
     li $v0, 10         # preparation to exit
     syscall            # exit the program

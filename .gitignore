@@ -8,5 +8,6 @@
 .blg
 .aux
 *.py
+.DS_Store
 #Ignore all jars. Ignore MARS jar
 *.jar
