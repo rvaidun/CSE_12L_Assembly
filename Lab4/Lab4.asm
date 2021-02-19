@@ -29,14 +29,21 @@
 # if length of stack == 0 print "SUCCESS: There are {count} pairs of braces.\n
 # else: print "ERROR - Brace(s) still on stack: {braces}\n"
 ##########################################################################
+#                        Saved Registers:
+# $s0 - file name
+# $s1 - address of opened file
+# $s2 - amount of items in stack
+# $s3 - position of the file
+############################################################################
 .data
     enterMsg:           .asciiz "You entered the file:\n"
     errorInvalidArg:    .asciiz "ERROR: Invalid program argument.\n"
-    errorMisMatch1:     .asciiz "ERROR - There is a brace mismatch: "
-    errorMisMatch2:     .asciiz " at index "
+    errorMisMatch1msg:     .asciiz "ERROR - There is a brace mismatch: "
+    errorMisMatch2msg:     .asciiz " at index "
     errorStack:         .asciiz "ERROR - Brace(s) still on stack: "
     newline:            .asciiz "\n"
-    filebuffer:         .space 128
+    filebuffer:         .space 2
+    testd:              .asciiz "Finished reading from buffer"
 .text
 main:
     la $a0, enterMsg
@@ -65,23 +72,66 @@ main:
     li $v0, 13         # prepare to open_file
     syscall
     move $s1, $v0      # save file descriptor to $s1, address of opened file
-    li $s2, 0          # $s2 amount of items in stack
+    li $s2, 0          # $s2 stack counter
+    li $s3, 0          # $s3 current file position
+    li $s4, 0          # $s4 matching pairs
+    loopBuffer:
+    jal readFileToBuffer # read file to buffer. Will return amount of bytes in buffer in $v0
+    beqz $v0, fileFinished
+    move $a0, $v0        # pass bytes in buffer to readFile
+    jal readFile         # read each byte of buffer
+    j loopBuffer
 
-    jal readFile       # read file to buffer
+############################################################################
+# Procedure: readFile
+# Description: for each byte in current buffer save to stack if bracket and check if brace mismatch exists
+# registers to be used:
+#   $a0 - argument for max amount of loops
+#   $t0 - counter for times looped through current buffer,
+#   $t2 - max amount of times to loop
+#   $t3 - byte we are looking at
+############################################################################
+readFile:
     li $t0, 0          # $t0 is the amount of times we looped through current buffer
-    move $t1, $v1      # $t2 is max amount of times we can loop
+    move $t1, $a0      # $t1 is max amount of times we can loop
     la $t2, filebuffer # load address of file buffer to $t2
+    # Start loop
+    readFileLoop:
+    beq $t0, $t1, return # if reached max amount of loops return
+    
+    lb $t3, ($t2) # $t3 is the byte we are looking at
+    addi $s3, $s3, 1 # add 1 to file position
 
-    loopbuffer:
-    beq $t0, $t1, readFile
-    lb $a0, 0($t2)
-    li $v0, 11
-    syscall
+    # Check if byte is an open bracket ([{
+    # ascii for ([{ is 40, 91, 123 respectively
+    beq $t3, 40, openbyte nop
+    beq $t3, 91, openbyte nop
+    beq $t3, 123, openbyte nop
+
+    # Check if byte is a closed bracket
+    # ascii for )]} is 41, 93, 125 respectively
+    beq $t3, 41, closebyte nop
+    beq $t3, 93, closebyte nop
+    beq $t3, 125, closebyte nop
+
     addi $t0, $t0, 1
     addi $t2, $t2, 1
-    j loopbuffer
+    j readFileLoop
 
-    j Exit
+    # openbyte: Add $t3 to stack since it is an open byte
+    openbyte:
+    addi $sp, $sp, -1 # make space in the stack for 1 byte
+    sb $t3, ($sp) # store $t3 to stack
+    addi $s2, $s2, 1 # add 1 to stack counter
+    j readFileLoop
+    # closebyte: Check if there is matching byte in stack. If byte exists pop from stack. Else error and exit
+    closebyte:
+    beqz $s2, printMisMatchError # print mis match error if no items in stack
+    lb $t4, ($sp) # store top of stack in $t4
+    
+    bne $t3, 40, closebyte2 # go to 
+
+    closebyte2:
 
 ############################################################################
 # Procedure: readFile
@@ -90,22 +140,26 @@ main:
 #   $s1 - address of opened file
 #   $v1 - return amount of bytes in buffer
 ############################################################################
-readFile:
+readFileToBuffer:
     move $a0, $s1
     la $a1, filebuffer
-    li $a2, 128
+    li $a2, 2
     li $v0, 14
     syscall
-    beq $v0, 0, Exit
-    move $v1, $v0
     jr $ra
+
+fileFinished:
+    la $a0, testd
+    li $v0, 4
+    syscall
+    j Exit
 ############################################################################
 # Procedure: firstNumber
 # Description: Check if the first character is a number and if true then print error
 # registers to be used:
 #   $t0 - first character
 #   $t1, $t2 - Boolean to check if character falls between specific ascii range
-#   $t5 - AND of $t1, $t2
+#   $t3 - AND of $t1, $t2
 ############################################################################
 firstNumber:
     # Check for uppsercase letters
@@ -122,10 +176,7 @@ firstNumber:
     beq $t3, 1, return # if $t3 is true go to main
     nop
     # print error message and exit
-    la $a0, errorInvalidArg
-    li $v0, 4
-    syscall
-    j Exit
+    j printInvalidArg
 
 ############################################################################
 # Procedure: validFileName
@@ -177,11 +228,41 @@ validFileName:
         nop
 
         # if none of the checks pass print error exit
-        printInvalidArg:
-        la $a0, errorInvalidArg
-        li $v0, 4
-        syscall
-        j Exit
+        j printInvalidArg
+############################################################################
+# Procedure: printMisMatchError Called only from readFile
+# Description: prints mismatch error
+# registers to be used:
+#   $s3 - position in file
+#   $t3 - Bracket that is mismatched. Value set in readFile
+############################################################################
+printMisMatchError:
+    la $a0, errorMisMatch1msg
+    li $v0, 4
+    syscall # print first part of error message
+
+    move $a0, $t3
+    li $v0, 11
+    syscall # print the character that is mismatched
+
+    la $a0, errorMisMatch2msg
+    li $v0, 4
+    syscall # print the second part of error message
+
+    move $a0, $s3
+    li $v0, 1
+    syscall # print the index of the mismatch
+
+    move $a0, newline
+    li $v0, 4
+    syscall # new line
+    j Exit
+
+printInvalidArg:
+    la $a0, errorInvalidArg
+    li $v0, 4
+    syscall
+    j Exit
 
 return:
     jr $ra
