@@ -86,10 +86,12 @@ main:
 # Procedure: readFile
 # Description: for each byte in current buffer save to stack if bracket and check if brace mismatch exists
 # registers to be used:
-#   $a0 - argument for max amount of loops
 #   $t0 - counter for times looped through current buffer,
-#   $t2 - max amount of times to loop
+#   $t1 - max amount of loops
+#   $t2 - file buffer
 #   $t3 - byte we are looking at
+#   $t4 - top byte from stack
+#   $t5 - temporarily save $ra in this register
 ############################################################################
 readFile:
     li $t0, 0          # $t0 is the amount of times we looped through current buffer
@@ -100,22 +102,28 @@ readFile:
     beq $t0, $t1, return # if reached max amount of loops return
     
     lb $t3, ($t2) # $t3 is the byte we are looking at
-    addi $s3, $s3, 1 # add 1 to file position
 
     # Check if byte is an open bracket ([{
     # ascii for ([{ is 40, 91, 123 respectively
-    beq $t3, 40, openbyte nop
-    beq $t3, 91, openbyte nop
-    beq $t3, 123, openbyte nop
-
+    beq $t3, 40, openbyte
+    nop
+    beq $t3, 91, openbyte
+    nop
+    beq $t3, 123, openbyte
+    nop
+    afteropenbyte:
     # Check if byte is a closed bracket
     # ascii for )]} is 41, 93, 125 respectively
-    beq $t3, 41, closebyte nop
-    beq $t3, 93, closebyte nop
-    beq $t3, 125, closebyte nop
-
-    addi $t0, $t0, 1
-    addi $t2, $t2, 1
+    beq $t3, 41, closebyte
+    nop
+    beq $t3, 93, closebyte
+    nop
+    beq $t3, 125, closebyte
+    nop
+    afterclosebyte:
+    addi $t0, $t0, 1 # add 1 to counter
+    addi $t2, $t2, 1 # add 1 to file address
+    addi $s3, $s3, 1 # add 1 to file position
     j readFileLoop
 
     # openbyte: Add $t3 to stack since it is an open byte
@@ -123,16 +131,50 @@ readFile:
     addi $sp, $sp, -1 # make space in the stack for 1 byte
     sb $t3, ($sp) # store $t3 to stack
     addi $s2, $s2, 1 # add 1 to stack counter
-    j readFileLoop
+    j afteropenbyte
     # closebyte: Check if there is matching byte in stack. If byte exists pop from stack. Else error and exit
     closebyte:
     beqz $s2, printMisMatchError # print mis match error if no items in stack
+    nop
     lb $t4, ($sp) # store top of stack in $t4
     
-    bne $t3, 40, closebyte2 # go to 
+    # check for ()
+    bne $t3, 41, closebyte2 # if current bracket is not ) go to close byte 2
+    nop
+    bne $t4, 40, closebyte2 # if not ( go to close byte 2
+    nop
+    move $t5, $ra # save ra in r5
+    jal popStack # go to popstack
+    move $ra, $t5 # restore ra
+    j afterclosebyte
 
-    closebyte2:
+    closebyte2: # check for []
+    bne $t3, 93, closebyte3
+    nop 
+    bne $t4, 91, closebyte3
+    nop
+    move $t5, $ra # save ra in r5
+    jal popStack # go to popstack
+    move $ra, $t5 # restore ra
+    j afterclosebyte
 
+    closebyte3: # check for {}
+    bne $t3, 125, closebyte4
+    nop
+    bne $t4, 123, closebyte4
+    nop
+    move $t5, $ra # save ra in r5
+    jal popStack # go to popstack
+    move $ra, $t5 # restore ra
+    j afterclosebyte
+
+    closebyte4: # if none of the brace pairs are matching print mismatch error
+    j printMisMatchError
+
+    popStack:
+    addi $sp, $sp, 1 # adding space back to stack
+    addi $s4, $s4, 1 # add 1 to matching pairs
+    jr $ra
 ############################################################################
 # Procedure: readFile
 # Description: read the file to buffer
@@ -253,7 +295,7 @@ printMisMatchError:
     li $v0, 1
     syscall # print the index of the mismatch
 
-    move $a0, newline
+    la $a0, newline
     li $v0, 4
     syscall # new line
     j Exit
