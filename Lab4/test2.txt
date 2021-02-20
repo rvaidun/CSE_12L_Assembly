@@ -1,0 +1,1 @@
+(this[should{read there is a brace mismatch error)}])
