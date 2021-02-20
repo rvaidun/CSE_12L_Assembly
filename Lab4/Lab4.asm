@@ -41,9 +41,10 @@
     errorMisMatch1msg:     .asciiz "ERROR - There is a brace mismatch: "
     errorMisMatch2msg:     .asciiz " at index "
     errorStack:         .asciiz "ERROR - Brace(s) still on stack: "
+    successmsg:         .asciiz "SUCCESS: There are "
+    successmsg2:        .asciiz " pairs of braces."
     newline:            .asciiz "\n"
     filebuffer:         .space 2
-    testd:              .asciiz "Finished reading from buffer"
 .text
 main:
     la $a0, enterMsg
@@ -137,7 +138,7 @@ readFile:
     beqz $s2, printMisMatchError # print mis match error if no items in stack
     nop
     lb $t4, ($sp) # store top of stack in $t4
-    
+
     # check for ()
     bne $t3, 41, closebyte2 # if current bracket is not ) go to close byte 2
     nop
@@ -174,6 +175,7 @@ readFile:
     popStack:
     addi $sp, $sp, 1 # adding space back to stack
     addi $s4, $s4, 1 # add 1 to matching pairs
+    addi $s2, $s2, -1 # remove 1 brace from brace counter
     jr $ra
 ############################################################################
 # Procedure: readFile
@@ -189,11 +191,53 @@ readFileToBuffer:
     li $v0, 14
     syscall
     jr $ra
-
+############################################################################
+# Procedure: fileFinished
+# Description: check if stack still has braces and print appropriate message
+# registers to be used:
+#   $s2 - total amount of braces in stack
+#   $t0 - counter for stack
+############################################################################
 fileFinished:
-    la $a0, testd
+    beqz $s2, printSuccess
+    li $t0, 0
+
+    # If stack is not empty print error message with the stack error message
+    la $a0, errorStack
+    li $v0, 4
+    syscall # print first part of message
+    stackloop:
+        beq $t0, $s2, afterstackloop
+        lb $a0, ($sp) # load top of stack to $a0
+        addi $sp, $sp, 1 # add 1 to stack
+        li $v0, 11
+        syscall # print character
+        addi $t0, $t0, 1
+        j stackloop
+
+    afterstackloop:
+    la $a0, newline
     li $v0, 4
     syscall
+    j Exit
+
+printSuccess:
+    la $a0, successmsg
+    li $v0, 4
+    syscall # print first part of message message
+    
+    move $a0, $s4
+    li $v0, 1
+    syscall # print matching pairs
+
+    la $a0, successmsg2
+    li $v0, 4
+    syscall # print second part of message
+
+    la $a0, newline
+    li $v0, 4
+    syscall # print newline
+
     j Exit
 ############################################################################
 # Procedure: firstNumber
@@ -272,7 +316,14 @@ validFileName:
         # if none of the checks pass print error exit
         j printInvalidArg
 ############################################################################
-# Procedure: printMisMatchError Called only from readFile
+# Procedure: printSuccess
+# Description: prints success message
+# registers to be used:
+#   $s4 - matching braces counter
+############################################################################
+
+############################################################################
+# Procedure: printMisMatchError - Only works when called only from readFile
 # Description: prints mismatch error
 # registers to be used:
 #   $s3 - position in file
