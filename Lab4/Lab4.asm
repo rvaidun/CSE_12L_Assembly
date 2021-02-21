@@ -34,6 +34,7 @@
 # $s1 - address of opened file
 # $s2 - amount of items in stack
 # $s3 - position of the file
+# $s4 - matching pairs
 ############################################################################
 .data
     enterMsg:           .asciiz "You entered the file:\n"
@@ -133,6 +134,7 @@ readFile:
     sb $t3, ($sp) # store $t3 to stack
     addi $s2, $s2, 1 # add 1 to stack counter
     j afteropenbyte
+    
     # closebyte: Check if there is matching byte in stack. If byte exists pop from stack. Else error and exit
     closebyte:
     beqz $s2, printMisMatchError # print mis match error if no items in stack
@@ -228,7 +230,7 @@ printSuccess:
     
     move $a0, $s4
     li $v0, 1
-    syscall # print matching pairs
+    syscall # print matching pairs ($s4)
 
     la $a0, successmsg2
     li $v0, 4
@@ -315,12 +317,6 @@ validFileName:
 
         # if none of the checks pass print error exit
         j printInvalidArg
-############################################################################
-# Procedure: printSuccess
-# Description: prints success message
-# registers to be used:
-#   $s4 - matching braces counter
-############################################################################
 
 ############################################################################
 # Procedure: printMisMatchError - Only works when called only from readFile
