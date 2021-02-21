@@ -31,4 +31,9 @@ This program is intended to be run using MARS IDE for MIPS.
 2. From the simulator go to file -> open and open the Lab4.asm file
 3. From the menu bar go to Run -> Assemble
 4. Now go to Run -> Go
-5. The program is started in the bottom console. Enter the height for the triangle in the console and press enter
+5. The program output is in the bottom console.
+
+You can also run the program from the Command Line with the following command:
+java -jar PATH_TO_JAR_FILE Lab4.asm  nc pa TEST.txt
+"nc" specifies not to print the copyright message
+everything after the "pa" are the Program Arguments, in this case "TEST.txt"
