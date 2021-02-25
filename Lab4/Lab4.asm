@@ -31,7 +31,7 @@
 ##########################################################################
 #                        Saved Registers:
 # $s0 - file name
-# $s1 - address of opened file
+# $s1 - address of opened file (file descriptor)
 # $s2 - amount of items in stack
 # $s3 - position of the file
 # $s4 - matching pairs
@@ -70,7 +70,8 @@ main:
 
     # Open File
     move $a0, $s0      # move file name to arguments
-    li $a1, 0          # set mode to read
+    li $a1, 0          # set to read
+    li $a2, 0          # set mode to 0
     li $v0, 13         # prepare to open_file
     syscall
     move $s1, $v0      # save file descriptor to $s1, address of opened file
@@ -198,9 +199,13 @@ readFileToBuffer:
 # Description: check if stack still has braces and print appropriate message
 # registers to be used:
 #   $s2 - total amount of braces in stack
+#   $s1 - file descriptor
 #   $t0 - counter for stack
 ############################################################################
 fileFinished:
+    move $a0, $s1
+    li $v0, 16
+    syscall # Close the open file
     beqz $s2, printSuccess
     li $t0, 0
 
