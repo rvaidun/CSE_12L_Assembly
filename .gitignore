@@ -11,3 +11,4 @@
 .DS_Store
 #Ignore all jars. Ignore MARS jar
 *.jar
+Lab5/lab5_w21_output.hex
