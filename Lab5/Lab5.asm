@@ -148,6 +148,14 @@ get_pixel: nop
 #*****************************************************
 draw_horizontal_line: nop
 	# YOUR CODE HERE, only use t registers (and a, v where appropriate)
+	li $t0, 0 # x
+	lw $t2, originAddress
+	draw_horizontal_line_loop:
+		beq $t0, 128, draw_horizontal_line_loop_end
+		getPixelAddress($t1, $t0, $a0, $t2) # $t1 is return
+		sw $a1, ($t1)
+		addi $t0, $t0, 1
+	draw_horizontal_line_loop_end:
  	jr $ra
 
 
@@ -162,6 +170,14 @@ draw_horizontal_line: nop
 #*****************************************************
 draw_vertical_line: nop
 	# YOUR CODE HERE, only use t registers (and a, v where appropriate)
+	li $t0, 0 # x
+	lw $t2, originAddress
+	draw_vertical_line_loop:
+		beq $t0, 128, draw_vertical_line_loop_end
+		getPixelAddress($t1, $a0, $t0, $t2) # $t1 is return
+		sw $a1, ($t1)
+		addi $t0, $t0, 1
+	draw_vertical_line_loop_end:
  	jr $ra
 
 
