@@ -51,6 +51,10 @@
 #	%output: register to store memory address in
 .macro getPixelAddress(%output %x %y %origin)
 	# YOUR CODE HERE
+	mul %output, %y, 128
+	add %output, %x, %output
+	mul %output, %output, 4
+	add %output, %output, %origin
 .end_macro
 
 
@@ -76,6 +80,24 @@ syscall
 #*****************************************************
 clear_bitmap: nop
 	# YOUR CODE HERE, only use t registers (and a, v where appropriate)
+	li $t0, 0 # x
+	lw $t2, originAddress
+	clear_bitmap_loop1:
+		beq $t0, 128, clear_bitmap_end
+		nop
+		li $t1, 0 # y
+		clear_bitmap_loop2:
+			beq $t1, 128, clear_bitmap_loop2_end
+			nop
+
+			getPixelAddress($v0,$t0,$t1,$t2)
+			sw $a0, 0($v0)
+			addi $t1, $t1, 1 # increment $t1
+			j clear_bitmap_loop2
+		clear_bitmap_loop2_end:
+		addi $t0, $t0, 1 # increment $t0
+		j clear_bitmap_loop1
+	clear_bitmap_end:
  	jr $ra
 
 #*****************************************************
