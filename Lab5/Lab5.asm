@@ -114,6 +114,10 @@ clear_bitmap: nop
 #*****************************************************
 draw_pixel: nop
 	# YOUR CODE HERE, only use t registers (and a, v where appropriate)
+	getCoordinates($t0, $t1, $a0) # x is $t0, y is $t1
+	lw $t2, originAddress
+	getPixelAddress($t3,$t0,$t1,$t2) # output is $t3
+	sw $a1, ($t3) # Store color in t3
 	jr $ra
 	
 #*****************************************************
