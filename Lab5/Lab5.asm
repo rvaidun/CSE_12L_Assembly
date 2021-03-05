@@ -29,6 +29,8 @@
 #	%y: register to store 0x000000YY in
 .macro getCoordinates(%input %x %y)
 	# YOUR CODE HERE
+	and %y, %input, 0x000000FF
+	srl %x, %input, 16
 .end_macro
 
 # Macro that takes Coordinates in (%x,%y) where
@@ -125,6 +127,10 @@ draw_pixel: nop
 #*****************************************************
 get_pixel: nop
 	# YOUR CODE HERE, only use t registers (and a, v where appropriate)
+	lw $t2, originAddress
+	getCoordinates($a0, $t0, $t1)
+	getPixelAddress($t3, $t0, $t1, $t2)
+	lw $v0, ($t3)
 	jr $ra
 
 #*****************************************************
