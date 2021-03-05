@@ -12,3 +12,6 @@
 #Ignore all jars. Ignore MARS jar
 *.jar
 Lab5/lab5_w21_output.hex
+Lab5/.vscode/
+Lab5/my_tests.asm
+lab5/my_output.hex

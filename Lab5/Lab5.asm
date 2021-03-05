@@ -117,7 +117,7 @@ clear_bitmap: nop
 #*****************************************************
 draw_pixel: nop
 	# YOUR CODE HERE, only use t registers (and a, v where appropriate)
-	getCoordinates($t0, $t1, $a0) # x is $t0, y is $t1
+	getCoordinates($a0, $t0, $t1) # x is $t0, y is $t1
 	lw $t2, originAddress
 	getPixelAddress($t3,$t0,$t1,$t2) # output is $t3
 	sw $a1, ($t3) # Store color in t3
@@ -158,6 +158,7 @@ draw_horizontal_line: nop
 		getPixelAddress($t1, $t0, $a0, $t2) # $t1 is return
 		sw $a1, ($t1)
 		addi $t0, $t0, 1
+		j draw_horizontal_line_loop
 	draw_horizontal_line_loop_end:
  	jr $ra
 
@@ -180,6 +181,7 @@ draw_vertical_line: nop
 		getPixelAddress($t1, $a0, $t0, $t2) # $t1 is return
 		sw $a1, ($t1)
 		addi $t0, $t0, 1
+		j draw_vertical_line_loop
 	draw_vertical_line_loop_end:
  	jr $ra
 
@@ -213,7 +215,8 @@ draw_crosshair: nop
 	# get current color of pixel at the intersection, store it in s4
 	# YOUR CODE HERE, only use the s0-s4 registers (and a, v where appropriate)
 	lw $s0, originAddress
-	 getPixelAddress($s4, $s2, %s3, $s0)
+	 getPixelAddress($s4, $s2, $s3, $s0)
+	 lw $s4, ($s4)
 	# draw horizontal line (by calling your `draw_horizontal_line`) function
 	# YOUR CODE HERE, only use the s0-s4 registers (and a, v where appropriate)
 	move $a0, $s3 # set parameter to y
@@ -228,7 +231,7 @@ draw_crosshair: nop
 	# YOUR CODE HERE, only use the s0-s4 registers (and a, v where appropriate)
 	formatCoordinates($s0, $s2, $s3)
 	move $a0, $s0 # set parameter to 0x00XX00YY
-	move $a1, $s1 # set parameter to color
+	move $a1, $s4 # set parameter to color
 	jal draw_pixel
 	move $sp $s5
 	pop($s5)
