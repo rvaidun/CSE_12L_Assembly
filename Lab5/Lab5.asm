@@ -42,6 +42,9 @@
 #	%output: register to store 0x00XX00YY in
 .macro formatCoordinates(%output %x %y)
 	# YOUR CODE HERE
+	sll %output, %x, 16
+	or %output, %output, %y
+	
 .end_macro 
 
 # Macro that converts pixel coordinate to address
@@ -209,16 +212,24 @@ draw_crosshair: nop
 	
 	# get current color of pixel at the intersection, store it in s4
 	# YOUR CODE HERE, only use the s0-s4 registers (and a, v where appropriate)
-
+	lw $s0, originAddress
+	 getPixelAddress($s4, $s2, %s3, $s0)
 	# draw horizontal line (by calling your `draw_horizontal_line`) function
 	# YOUR CODE HERE, only use the s0-s4 registers (and a, v where appropriate)
-
+	move $a0, $s3 # set parameter to y
+	move $a1, $s1 # set parameter to 0x00RRGGBB
+	jal draw_horizontal_line
 	# draw vertical line (by calling your `draw_vertical_line`) function
 	# YOUR CODE HERE, only use the s0-s4 registers (and a, v where appropriate)
-
+	move $a0, $s2 # set parameter to x
+	move $a1, $s1 # set parameter to 0x00RRGGBB
+	jal draw_vertical_line
 	# restore pixel at the intersection to its previous color
 	# YOUR CODE HERE, only use the s0-s4 registers (and a, v where appropriate)
-
+	formatCoordinates($s0, $s2, $s3)
+	move $a0, $s0 # set parameter to 0x00XX00YY
+	move $a1, $s1 # set parameter to color
+	jal draw_pixel
 	move $sp $s5
 	pop($s5)
 	pop($s4)
